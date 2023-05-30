@@ -19,8 +19,8 @@ class FirstScr(Screen):
         txt_name = Label(text = "Enter a name:")
         txt_age = Label(text = "Enter a age:")
         
-        input_name = TextInput(text_hint = "Enter a name", multiline = False)
-        input_age = TextInput(text_hint = "Enter a age", multiline = False)
+        input_name = TextInput(text = "Enter a name", multiline = False)
+        input_age = TextInput(text = "Enter a age", multiline = False)
         
         btn = Button(text = 'Next')
         btn.on_press = self.next()
@@ -54,7 +54,7 @@ class SecondScr(Screen):
         txt = Label(text = txt_test1)
         txt_pulse = Label(text = "Count a pulse:")
 
-        input_name = TextInput(text_hint = "Enter a pulse", multiline = False)
+        input_pulse = TextInput(text= "Enter a pulse", multiline = False)
 
         btn = Button(text = 'Next')
         btn.on_press = self.next()
@@ -77,7 +77,7 @@ class ThirdScr(Screen):
 
         vl = BoxLayout(orientation = 'vertical')
 
-        txt = Label(text = txt_test_2)
+        txt = Label(text = txt_test2)
 
         btn = Button(text = 'Next')
         btn.on_press = self.next()
@@ -94,7 +94,7 @@ class FourthScr(Screen):
         hl1 = BoxLayout()
         hl2 = BoxLayout()
 
-        txt = Label(text = txt_test_2)
+        txt = Label(text = txt_test2)
 
         txt_first = Label(text = "First:")
         txt_second = Label(text = "Second:")
