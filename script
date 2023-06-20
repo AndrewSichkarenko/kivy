@@ -6,11 +6,21 @@ from kivy.uix.boxlayout import *
 from kivy.uix.screenmanager import *
 from instructions import *
 from ruffier import *
-
+from kivy.core.window import Window
+from kivy.clock import Clock
+from seconds import *
+from kivy.properties import NumericProperty, BooleanProperty, StringProperty
 
 age = 0
 name = ''
 p1,p2,p3 = 0,0,0
+
+def check_int(str_num):
+    try:
+        return int(str_num)
+    except:
+        return False
+
 class FirstScr(Screen):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
@@ -47,12 +57,22 @@ class FirstScr(Screen):
         global name
         global age
         name = self.input_name.text
-        age = int(self.input_age.text)
-        self.manager.transition.direction = 'left'
-        self.manager.current = "second"
+        age = check_int(self.input_age.text)
+        if age == False or age < 7:
+            age = 0
+            self.input_age.text = str(age)
+        else:
+            self.manager.transition.direction = 'left'
+            self.manager.current = "second"
 
 class SecondScr(Screen):
     def __init__(self,**kwargs):
+
+        self.next_screen = False
+
+        self.lbl_sec = Seconds(1)
+        self.lbl_sec.bind(done = self.sec_finished)
+    
         super().__init__(**kwargs)
 
         vl = BoxLayout(orientation = 'vertical')
@@ -62,9 +82,10 @@ class SecondScr(Screen):
         txt_pulse = Label(text = "Count a pulse:")
 
         self.input_pulse = TextInput(hint_text= "Enter a pulse", multiline = False)
+        self.input_pulse.set_disabled(True)
 
-        btn = Button(text = 'Next',size_hint_y = (1,None), height = '50px')
-        btn.on_press = self.next
+        self.btn = Button(text = 'Next',size_hint_y = (1,None), height = '50px')
+        self.btn.on_press = self.next
 
         vl.add_widget(txt)
 
@@ -73,14 +94,32 @@ class SecondScr(Screen):
 
         vl.add_widget(hl)
 
-        vl.add_widget(btn)
+        vl.add_widget(self.lbl_sec)
+
+        vl.add_widget(self.btn)
 
         self.add_widget(vl)
 
+    
+    def sec_finished(self, *args):
+        self.next_screen  = True
+        self.input_pulse.set_disabled(False)
+        self.btn.set_disabled(False)
+        self.btn.text = 'Продовжити'
+    
     def next(self):
-        global p1
-        p1 = int(self.input_pulse.text)
-        self.manager.current = "third"
+        if not self.next_screen:
+            self.btn.set_disabled(True)
+            self.lbl_sec.start()
+        else:
+            global p1
+            p1 = check_int(self.input_pulse.text)
+            if p1 == False:
+                p1 = 0
+                self.input_pulse.text = str(p1)
+            else:
+                self.manager.current = "third"
+        
 
 class ThirdScr(Screen):
     def __init__(self,**kwargs):
@@ -103,6 +142,14 @@ class ThirdScr(Screen):
 
 class FourthScr(Screen):
     def __init__(self,**kwargs):
+
+        self.next_screen = False
+
+        self.lbl_sec = Seconds(1)
+        self.lbl_sec.bind(done = self.sec_finished)
+        self.lbl1 = Label(text = 'Рахуйте пульс')
+        self.stage = 0
+
         super().__init__(**kwargs)
 
         vl = BoxLayout(orientation = 'vertical')
@@ -116,10 +163,12 @@ class FourthScr(Screen):
         txt_second = Label(text = "Second:")
 
         self.input_first = TextInput()
+        self.input_first.set_disabled(True)
         self.input_second = TextInput()
+        self.input_second.set_disabled(True)
 
-        btn = Button(text = 'Next',size_hint_y = (1,None), height = '50px')
-        btn.on_press = self.next
+        self.btn = Button(text = 'Next',size_hint_y = (1,None), height = '50px')
+        self.btn.on_press = self.next
 
         vl.add_widget(txt)
 
@@ -132,16 +181,49 @@ class FourthScr(Screen):
         vl.add_widget(hl1)
         vl.add_widget(hl2)
 
-        vl.add_widget(btn)
+        vl.add_widget(self.lbl_sec)
+        vl.add_widget(self.lbl1)
+
+        vl.add_widget(self.btn)
 
         self.add_widget(vl)
 
+    def sec_finished(self,*args):
+        if self.lbl_sec.done:
+            if self.stage == 0:
+                self.stage = 1
+                self.lbl1.text = 'Відпочивайте'
+                self.lbl_sec.restart(2)
+                self.input_first.set_disabled(False)
+            elif self.stage == 1:
+                self.stage = 2
+                self.lbl1.text='Рахуйте пульс'
+                self.lbl_sec.restart(1)
+            elif self.stage == 2:
+                self.input_second.set_disabled(False)
+                self.btn.set_disabled(False)
+                self.btn.text = 'Завершити'
+                self.next_screen = True
+
+
     def next(self):
-        global p2
-        global p3
-        p2 = int(self.input_first.text)
-        p3 = int(self.input_second.text)
-        self.manager.current = "fifth"
+        if not self.next_screen:
+            self.btn.set_disabled(True)
+            self.lbl_sec.start()
+        
+        else:
+            global p2
+            global p3
+            p2 = check_int(self.input_first.text)
+            p3 = check_int(self.input_second.text)
+            if p2 == False:
+                p2 = 0
+                self.input_first.text = str(p2)
+            if p3 == False:
+                p3 = 0
+                self.input_second.text = str(p3) 
+            else:
+                self.manager.current = "fifth"
 
 class FifthScr(Screen):
     def __init__(self,**kwargs):
@@ -159,8 +241,6 @@ class FifthScr(Screen):
     
     def before(self):
         self.txt.text = name+'\n'+txt_index+ str(ruffier_index(p1, p2, p3)) + '\n'+ txt_workheart + txt_res[ruffier_result(ruffier_index(p1, p2, p3),neud_level(age))]
-
-
 
 class MyApp(App):
     def build(self):
