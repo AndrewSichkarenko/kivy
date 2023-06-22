@@ -10,10 +10,22 @@ from kivy.core.window import Window
 from kivy.clock import Clock
 from seconds import *
 from kivy.properties import NumericProperty, BooleanProperty, StringProperty
+from kivy.animation import Animation
 
 age = 0
 name = ''
 p1,p2,p3 = 0,0,0
+back = (1, 0.8, 0.1, 0.28)
+
+Window.clearcolor = back
+w_width = Window.width
+
+w_width = w_width / 1920
+font = str(20 * w_width)
+font = font + 'px'
+font = '20px'
+
+btn_color = (0.99, 0.6, 0.01, 0.28)
 
 def check_int(str_num):
     try:
@@ -24,20 +36,23 @@ def check_int(str_num):
 class FirstScr(Screen):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
+
+        
         
         vl = BoxLayout(orientation = 'vertical')
         hl1 = BoxLayout(size_hint_y = (1,None), height = '50px')
         hl2 = BoxLayout(size_hint_y = (1,None), height = '50px')
         
-        txt = Label(text = txt_instruction)
-        txt_name = Label(text = "Enter a name:")
-        txt_age = Label(text = "Enter a age:")
+        txt = Label(text = txt_instruction,font_size=font)
+        txt_name = Label(text = "Enter a name:",font_size=font)
+        txt_age = Label(text = "Enter a age:",font_size=font)
         
-        self.input_name = TextInput(hint_text = "Enter a name", multiline = False)
-        self.input_age = TextInput(hint_text = "Enter a age", multiline = False)
+        self.input_name = TextInput(hint_text = "Enter a name", multiline = False,font_size=font)
+        self.input_age = TextInput(hint_text = "Enter a age", multiline = False,font_size=font)
         
-        btn = Button(text = 'Next',size_hint_y = (1,None), height = '50px')
+        btn = Button(text = 'Next',size_hint_y = (1,None), height = '50px',font_size=font)
         btn.on_press = self.next
+        btn.background_color = btn_color
 
         vl.add_widget(txt)
 
@@ -78,14 +93,15 @@ class SecondScr(Screen):
         vl = BoxLayout(orientation = 'vertical')
         hl = BoxLayout(size_hint_y = (1,None), height = '50px')
 
-        txt = Label(text = txt_test1)
-        txt_pulse = Label(text = "Count a pulse:")
+        txt = Label(text = txt_test1,font_size=font)
+        txt_pulse = Label(text = "Count a pulse:",font_size=font)
 
-        self.input_pulse = TextInput(hint_text= "Enter a pulse", multiline = False)
+        self.input_pulse = TextInput(hint_text= "Enter a pulse", multiline = False,font_size=font)
         self.input_pulse.set_disabled(True)
 
-        self.btn = Button(text = 'Next',size_hint_y = (1,None), height = '50px')
+        self.btn = Button(text = 'Next',size_hint_y = (1,None), height = '50px',font_size=font)
         self.btn.on_press = self.next
+        self.btn.background_color = btn_color
 
         vl.add_widget(txt)
 
@@ -127,17 +143,24 @@ class ThirdScr(Screen):
 
         vl = BoxLayout(orientation = 'vertical')
 
-        txt = Label(text = txt_test2)
+        txt = Label(text = txt_test2,font_size=font)
 
-        btn = Button(text = 'Next',size_hint_y = (1,None), height = '50px')
-        btn.on_press = self.next
+        self.anim = (Animation(pos_hint={'top': 0.1},duration =2.0,background_color = (0.7,0.5,0.1,0.9)) + Animation(pos_hint={'left': 1},duration =1.0,background_color = (0.35,0.7,0.2,0.7)) ) 
+
+        self.btn = Button(text = 'Почати',size_hint = (None,None), height = '50px',width= '500px',font_size=font)
+        self.btn.on_press = self.next
+        self.btn.background_color = btn_color
 
         vl.add_widget(txt)
-        vl.add_widget(btn)
+        vl.add_widget(self.btn)
 
         self.add_widget(vl)
     
     def next(self):
+        self.anim.start(self.btn)
+        #self.btn.animation.on_complete = self.nextscreen
+
+    def nextscreen(self):    
         self.manager.current = "fourth"
 
 class FourthScr(Screen):
@@ -159,16 +182,17 @@ class FourthScr(Screen):
 
         txt = Label(text = txt_test2)
 
-        txt_first = Label(text = "First:")
-        txt_second = Label(text = "Second:")
+        txt_first = Label(text = "First:",font_size=font)
+        txt_second = Label(text = "Second:",font_size=font)
 
-        self.input_first = TextInput()
+        self.input_first = TextInput(font_size=font)
         self.input_first.set_disabled(True)
-        self.input_second = TextInput()
+        self.input_second = TextInput(font_size=font)
         self.input_second.set_disabled(True)
 
-        self.btn = Button(text = 'Next',size_hint_y = (1,None), height = '50px')
+        self.btn = Button(text = 'Next',size_hint_y = (1,None), height = '50px',font_size=font)
         self.btn.on_press = self.next
+        self.btn.background_color = btn_color
 
         vl.add_widget(txt)
 
@@ -231,7 +255,7 @@ class FifthScr(Screen):
 
         vl = BoxLayout(orientation = 'vertical')
 
-        self.txt = Label(text = '')
+        self.txt = Label(text = '',font_size=font)
 
         vl.add_widget(self.txt)
 
@@ -245,9 +269,9 @@ class FifthScr(Screen):
 class MyApp(App):
     def build(self):
         sm = ScreenManager()
+        sm.add_widget(ThirdScr(name='third'))
         sm.add_widget(FirstScr(name='first'))
         sm.add_widget(SecondScr(name='second'))
-        sm.add_widget(ThirdScr(name='third'))
         sm.add_widget(FourthScr(name='fourth'))
         sm.add_widget(FifthScr(name='fifth'))
         return sm
