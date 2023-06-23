@@ -11,6 +11,7 @@ from kivy.clock import Clock
 from seconds import *
 from kivy.properties import NumericProperty, BooleanProperty, StringProperty
 from kivy.animation import Animation
+from time import *
 
 age = 0
 name = ''
@@ -18,12 +19,12 @@ p1,p2,p3 = 0,0,0
 back = (1, 0.8, 0.1, 0.28)
 
 Window.clearcolor = back
-w_width = Window.width
+w_width =  4*(Window.width + Window.height)
 
-w_width = w_width / 1920
+w_width = w_width / 6000
 font = str(20 * w_width)
 font = font + 'px'
-font = '20px'
+#font = '20px'
 
 btn_color = (0.99, 0.6, 0.01, 0.28)
 
@@ -43,7 +44,8 @@ class FirstScr(Screen):
         hl1 = BoxLayout(size_hint_y = (1,None), height = '50px')
         hl2 = BoxLayout(size_hint_y = (1,None), height = '50px')
         
-        txt = Label(text = txt_instruction,font_size=font)
+        txt = Label(text = txt_instruction,font_size=font,size_hint=(1, None),text_size=(Window.width, None),valign='top')
+        txt.bind(texture_size=lambda instance, size: setattr(txt, 'height', size[1]))
         txt_name = Label(text = "Enter a name:",font_size=font)
         txt_age = Label(text = "Enter a age:",font_size=font)
         
@@ -145,11 +147,9 @@ class ThirdScr(Screen):
 
         txt = Label(text = txt_test2,font_size=font)
 
-        self.anim = (Animation(pos_hint={'top': 0.1},duration =2.0,background_color = (0.7,0.5,0.1,0.9)) + Animation(pos_hint={'left': 1},duration =1.0,background_color = (0.35,0.7,0.2,0.7)) ) 
-
-        self.btn = Button(text = 'Почати',size_hint = (None,None), height = '50px',width= '500px',font_size=font)
+        self.anim = Animation(pos_hint={'center_x': 1.1}, background_color=(0.7,0.5,0.1,0.9), duration =2.0) + Animation(pos_hint={'center_x': 0.1},background_color = (0.35,0.7,0.2,0.7))
+        self.btn = Button(text = 'Почати',size_hint = (None,None), pos_hint={'center_x': 0.5}, background_color=btn_color, height = '50px',width= (Window.width / 3),font_size=font)
         self.btn.on_press = self.next
-        self.btn.background_color = btn_color
 
         vl.add_widget(txt)
         vl.add_widget(self.btn)
@@ -158,7 +158,7 @@ class ThirdScr(Screen):
     
     def next(self):
         self.anim.start(self.btn)
-        #self.btn.animation.on_complete = self.nextscreen
+        self.anim.on_complete(self.nextscreen())
 
     def nextscreen(self):    
         self.manager.current = "fourth"
@@ -170,7 +170,7 @@ class FourthScr(Screen):
 
         self.lbl_sec = Seconds(1)
         self.lbl_sec.bind(done = self.sec_finished)
-        self.lbl1 = Label(text = 'Рахуйте пульс')
+        self.lbl1 = Label(text = 'Рахуйте пульс',size_hint_y = None, height = '40px',font_size=font)
         self.stage = 0
 
         super().__init__(**kwargs)
@@ -180,7 +180,7 @@ class FourthScr(Screen):
         hl1 = BoxLayout(size_hint_y = (1,None), height = '50px')
         hl2 = BoxLayout(size_hint_y = (1,None), height = '50px')
 
-        txt = Label(text = txt_test2)
+        txt = Label(text = txt_test2,font_size=font)
 
         txt_first = Label(text = "First:",font_size=font)
         txt_second = Label(text = "Second:",font_size=font)
@@ -269,9 +269,9 @@ class FifthScr(Screen):
 class MyApp(App):
     def build(self):
         sm = ScreenManager()
-        sm.add_widget(ThirdScr(name='third'))
         sm.add_widget(FirstScr(name='first'))
         sm.add_widget(SecondScr(name='second'))
+        sm.add_widget(ThirdScr(name='third'))
         sm.add_widget(FourthScr(name='fourth'))
         sm.add_widget(FifthScr(name='fifth'))
         return sm
