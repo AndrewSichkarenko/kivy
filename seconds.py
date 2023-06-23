@@ -1,6 +1,13 @@
 from kivy.properties import NumericProperty, BooleanProperty, StringProperty
 from kivy.uix.label import *
 from kivy.clock import Clock
+from kivy.core.window import Window
+
+w_width =  4*(Window.width + Window.height)
+
+w_width = w_width / 6000
+font = str(20 * w_width)
+font = font + 'px'
 
 class Seconds(Label):
     done = BooleanProperty(False)
@@ -9,8 +16,7 @@ class Seconds(Label):
         self.current = 0
         self.done = False
         my_text = 'Пройшло секунд:' + str(self.current)
-        self.height = '50px'
-        super().__init__(text = my_text)
+        super().__init__(text = my_text,size_hint_y = None, height = '40px', font_size = font)
     def restart(self, total, **kwargs):
         self.done = False
         self.total = total
